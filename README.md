@@ -1,1 +1,1 @@
-# Media-Hopper-Internship-Project
+# Media-Hopper-Intern-Project
