@@ -108,6 +108,7 @@ class KalturaEventNotificationEventType(object):
     OBJECT_CREATED = "5"
     OBJECT_DATA_CHANGED = "6"
     OBJECT_DELETED = "7"
+
     OBJECT_ERASED = "8"
     OBJECT_READY_FOR_REPLACMENT = "9"
     OBJECT_SAVED = "10"
