@@ -7,3 +7,6 @@ def filter():
     filter.metadataProfileIdEqual = profileId
     filter.metadataObjectTypeEqual = ks_type #KalturaMetadataObjectType
     results = client.metadata.list(filter).objects
+
+
+filter = KalturaMediaEntryFilter()
