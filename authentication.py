@@ -1,5 +1,5 @@
 from KalturaClient import *
-#from KalturaClient import Plugins
+from KalturaClient import Plugins
 
 userID = "kamelia.zhelyazkova@ed.ac.uk"
 ks_type = 2
@@ -25,14 +25,15 @@ except Base.KalturaException, e:
 
 print "Done."
 
-#filter = Plugins.Core.KalturaMediaEntryFilter()
-#filter.freeText = "1_j5689kew"
-#filter.orderBy = "-weight"
-#filter.advancedSearch = Plugins.Metadata.KalturaMetadataSearchItem()
 
-#pager = Plugins.Core.KalturaFilterPager()
-#results = client.media.list(filter, pager)
-#print results
+filter = Plugins.Core.KalturaMediaEntryFilter()
+filter.freeText = "1_j5689kew"
+filter.orderBy = "-weight"
+filter.advancedSearch = Plugins.Metadata.KalturaMetadataSearchItem()
+
+pager = Plugins.Core.KalturaFilterPager()
+results = client.media.list(filter, pager)
+print results
 
 #f = open('out.txt', 'w')
 #f.write(results)
