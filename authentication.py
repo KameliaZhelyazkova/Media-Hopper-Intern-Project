@@ -1,7 +1,7 @@
 from KalturaClient import *
 
 # session credentials
-userID = "kamelia.zhelyazkova@ed.ac.uk"
+userID = "admin"
 ks_type = 2
 admin_secret = "1a7227978d8228dde2a574fac2c9b371"
 partnerID = 1817881
