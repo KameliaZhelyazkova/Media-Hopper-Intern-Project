@@ -34,7 +34,7 @@ filter.advancedSearch = Plugins.Metadata.KalturaMetadataSearchItem()
 
 pager = Plugins.Core.KalturaFilterPager()
 results = client.media.list(filter, pager)
-print results
+print results.getObjects()[0].getName()
 
 
 print "Session Established."

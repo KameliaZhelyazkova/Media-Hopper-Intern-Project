@@ -1,31 +1,56 @@
 from KalturaClient import *
-#from KalturaClient import Plugins
+from KalturaClient import Plugins
 
-# SERVER SET UP
-userID = "admin"
-ks_type = 2
-admin_secret = "1a7227978d8228dde2a574fac2c9b371"
-partnerID = 1817881
+# SERVER SESSION PARAMETERS
+USER_ID = "admin"
+KS_TYPE = 2
+ADMIN_SECRET = "1a7227978d8228dde2a574fac2c9b371"
+PARTNER_ID = 1817881
 
-config = KalturaConfiguration(partnerID)
+
+# Initialise Session
+config = KalturaConfiguration(PARTNER_ID)
 config.serviceUrl = "http://www.kaltura.com/"
 client = KalturaClient(config)
 
-ks = client.generateSession(admin_secret, userID, ks_type, partnerID)
+ks = client.generateSession(ADMIN_SECRET, USER_ID, KS_TYPE, PARTNER_ID)
 client.setKs(ks)
 
 
+# Get all CC data
+ccMedia = []
 
-playlist = Plugins.Core.KalturaPlaylist()
-playlist.name = "Test2"
-playlist.description = "testing"
-playlist.userId = "connie.crowe@ed.ac.uk"
-playlist.licenseType = 3
-playlist.playlistType = 10
-playlist.totalResults = 10
+#for media in ccMedia:
+try:
+    filter = Plugins.Core.KalturaPlaylistFilter()
+    filter.nameEqual = "seconds"#media.getName()
+    filter.userIdEqual = "connie.crowe@ed.ac.uk"#media.getUserId()
+    pager = Plugins.Core.KalturaFilterPager()
+    filterResults = client.playlist.list(filter, pager)
+    print filterResults.objects
+    originalPlaylist = filterResults.objects[0]
 
-update_stats = ""
-print playlist.getPlaylistContent()
+except IndexError:
+    newPlaylist = Plugins.Core.KalturaPlaylist()
+    newPlaylist.setName("Connie's Creative Commons2")
+    newPlaylist.setDescription("All my Media which is licensed with a Creative Commons License")
+    newPlaylist.setUserId("connie.crowe@ed.ac.uk")#media.getUserId()"")
+    newPlaylist.setPlaylistType(3)
+    updateStats = ""
+    client.playlist.add(newPlaylist, updateStats)
+    originalPlaylist = newPlaylist
+
+
+id = originalPlaylist.getId()
+print "ID" + id
+
+
+#playlist = Plugins.Core.KalturaPlaylist()
+#playlist.name = "Connie Test"
+#update_stats = ""
+#playlist.setPlaylistContent("1_zmnvh38r")
+#print playlist.getPlaylistContent()
+#client.playlist.update("1_5lbnz26g", playlist, update_stats)
 #results = client.playlist.add(
 #    playlist,
 #    update_stats)

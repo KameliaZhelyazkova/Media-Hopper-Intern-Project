@@ -25,3 +25,41 @@ entryId = "1_j5689kew";
 #    print "could not get entry from Kaltura. Reason: %s" % repr(e)
 
 #print "Done."
+
+filter = Plugins.Core.KalturaMediaEntryFilter()
+filterAdvancedSearch = Plugins.Metadata.KalturaMetadataSearchItem()
+filterAdvancedSearch.type = 2
+filterAdvancedSearch.metadataProfileId = 7409571
+
+
+filterAdvancedSearchItems = Plugins.Core.KalturaSearchCondition()
+filterAdvancedSearchItems.field = "/*[local-name()='metadata']/*[local-name()='CCLicenceType']";
+filterAdvancedSearchItems.value = "Creative Commons - Attribution No Derivatives"
+pager = Plugins.Core.KalturaFilterPager()
+#print filterAdvancedSearch
+print filterAdvancedSearchItems
+
+
+filterAdvancedSearch.items = [filterAdvancedSearchItems]
+#print filterAdvancedSearch.items
+filter.advancedSearch = filterAdvancedSearch
+
+results = client.media.list(filter, pager)
+print "objs"
+for obj in results.getObjects():
+    print obj.getName()
+
+print results.getTotalCount()
+
+# filter = Plugins.Core.KalturaMediaEntryFilter()
+# filter.orderBy = "+ /*[local-name()='metadata']/*[local-name()='CCLicenceType']"
+# filter.advancedSearch = Plugins.Metadata.KalturaMetadataSearchItem()
+# filter.advancedSearch.type = 2
+# filter.advancedSearch.items = []
+# filter.advancedSearch.items.append(Plugins.Core.KalturaSearchCondition())
+# filter.advancedSearch.items[0].field = "/*[local-name()='metadata']/*[local-name()='CCLicenceType']"
+# filter.advancedSearch.items[0].value = "Creative Commons - Attribution"
+# filter.advancedSearch.metadataProfileId = 7409571
+# pager = Plugins.Core.KalturaFilterPager()
+# result = client.media.list(filter, pager)
+# print result.objects
