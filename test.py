@@ -27,20 +27,26 @@ entryId = "1_j5689kew";
 #print "Done."
 
 filter = Plugins.Core.KalturaMediaEntryFilter()
+
+
 filterAdvancedSearch = Plugins.Metadata.KalturaMetadataSearchItem()
 filterAdvancedSearch.type = 2
 filterAdvancedSearch.metadataProfileId = 7409571
 
-
 filterAdvancedSearchItems = Plugins.Core.KalturaSearchCondition()
-filterAdvancedSearchItems.field = "/*[local-name()='metadata']/*[local-name()='CCLicenceType']";
+filterAdvancedSearchItems.field = "/*[local-name()='metadata']/*[local-name()='CCLicenceType']"
 filterAdvancedSearchItems.value = "Creative Commons - Attribution No Derivatives"
+
+filterAdvancedSearchItems1 = Plugins.Core.KalturaSearchCondition()
+filterAdvancedSearchItems1.field = "/*[local-name()='metadata']/*[local-name()='CCLicenceType']"
+filterAdvancedSearchItems1.value = "Creative Commons - Attribution"
+
 pager = Plugins.Core.KalturaFilterPager()
 #print filterAdvancedSearch
-print filterAdvancedSearchItems
+#print filterAdvancedSearchItems
 
 
-filterAdvancedSearch.items = [filterAdvancedSearchItems]
+filterAdvancedSearch.items = [filterAdvancedSearchItems1]
 #print filterAdvancedSearch.items
 filter.advancedSearch = filterAdvancedSearch
 
@@ -49,7 +55,7 @@ print "objs"
 for obj in results.getObjects():
     print obj.getName()
 
-print results.getTotalCount()
+print results.getObjects()
 
 # filter = Plugins.Core.KalturaMediaEntryFilter()
 # filter.orderBy = "+ /*[local-name()='metadata']/*[local-name()='CCLicenceType']"
