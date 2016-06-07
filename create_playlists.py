@@ -17,55 +17,53 @@ ks = client.generateSession(ADMIN_SECRET, USER_ID, KS_TYPE, PARTNER_ID)
 client.setKs(ks)
 
 
+PLAYLISTNAME = "Creative Commons Stuff Proper Test Thing"
+
+
+
 # Get all CC data
-ccMedia = []
-
 """
-loop through all media in cc licence
-try to check if in playlist
-    save id of it
-except there is no newPlaylist
-    create a newPlaylist
-    save id of it
-
-add media to newPlaylist
+1_9xxyjomm, user admin
+1_zmnvh38r, user connie
+1_j5689kew, user marc
+1_y1nhebhv, marc
+1_x9s50hjz, marc
+1_afs38koe, connie
 """
-ccMedia = [client.media.get("1_aswwijmi"), client.media.get("1_9xxyjomm")]
 
-def __main__(self):
+
+ccMedia = [client.media.get("1_9xxyjomm"), client.media.get("1_zmnvh38r"), client.media.get("1_j5689kew"), client.media.get("1_y1nhebhv"), client.media.get("1_x9s50hjz"), client.media.get("1_afs38koe")]
+
+def main():
 
     for media in ccMedia:
         mediaId = media.getId()
+        print "Processing Media Entry " + str(mediaId)
+
         # retrieve the playlist if it exists
         try:
-            playlist = self.getExistingPlaylist(client, "CCTest", "connie.crowe@ed.ac.uk")
+            playlist = getExistingPlaylist(client, PLAYLISTNAME, media.getUserId())
             print "Found old playlist, id: " + str(playlist.getId())
 
         # the playlist does not yet exist
         except IndexError:
-            playlist = createNewPlaylist(client, "CCTest", "connie.crowe@ed.ac.uk")
+            playlist = createNewPlaylist(client, PLAYLISTNAME, media.getUserId())
             print "Created new playlist, id: " + str(playlist.getId())
 
         # add content if not already present
-        currentPlContent = playlist.getPlaylistContents()
+        currentPlContent = playlist.getPlaylistContent()
+        if currentPlContent != "":
+            contentToAdd = currentPlContent + ", " + mediaId
+        else:
+            contentToAdd = mediaId
         if mediaId not in currentPlContent:
+            addToPlaylist(client, playlist, contentToAdd)
+            print "Done, added " + str(mediaId) + "to " + str(playlist.getId())
 
 
 
-        #
-        # newPlaylist = Plugins.Core.KalturaPlaylist()
-        # print originalPlaylist.getPlaylistContent()
-        # newPlaylist.setPlaylistContent(originalPlaylist.getPlaylistContent().append(media.getId()))
-        # print originalPlaylist.getId()
-        # client.playlist.update(originalPlaylist.getId(), newPlaylist, updateStats)
-        # print "Done, added" + str(media.getId())
-        # print originalPlaylist.getId()
-        # print originalPlaylist.getPlaylistContent()
-
-
-
-def getExistingPlaylist(self, client, playlistName, userId):
-    """ Checks whether the desired playlist already exists and returns it"""
+def getExistingPlaylist(client, playlistName, userId):
+    """ Checks whether the desired playlist already exists and returns it """
     filter = Plugins.Core.KalturaPlaylistFilter()
     filter.nameEqual = playlistName
     filter.userIdEqual = userId
@@ -74,9 +72,8 @@ def getExistingPlaylist(self, client, playlistName, userId):
     return results.getObjects()[0]
 
 
-def createNewPlaylist(self, client, playlistName, userId):
-    """ Creates a new playlist with the specified parameters"""
-
+def createNewPlaylist(client, playlistName, userId):
+    """ Creates a new playlist with the specified parameters """
     playlist = Plugins.Core.KalturaPlaylist()
     playlist.setName(playlistName)
     playlist.setDescription("All my Media which is licensed with a Creative Commons License")
@@ -85,16 +82,15 @@ def createNewPlaylist(self, client, playlistName, userId):
 
     return client.playlist.add(playlist, "")
 
-def addToPlaylist(self, client, contentToAdd,  )
+
+def addToPlaylist(client, originalPlaylist, contentToAdd):
+    """ Updates playlist content """
     newPlaylist = Plugins.Core.KalturaPlaylist()
-    print originalPlaylist.getPlaylistContent()
-    newPlaylist.setPlaylistContent(originalPlaylist.getPlaylistContent().append(media.getId()))
-    print originalPlaylist.getId()
-    client.playlist.update(originalPlaylist.getId(), newPlaylist, updateStats)
-    print "Done, added" + str(media.getId())
-    print originalPlaylist.getId()
-    print originalPlaylist.getPlaylistContent()
+    newPlaylist.setPlaylistContent(contentToAdd)
+    client.playlist.update(originalPlaylist.getId(), newPlaylist, "")
 
 
 
+if __name__ == "__main__":
+    main()
 
