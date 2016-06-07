@@ -71,11 +71,12 @@ print filterAdvancedSearchItems
 filterAdvancedSearch.items = [filterAdvancedSearchItemsCCType1, filterAdvancedSearchItemsCCType2,
                               filterAdvancedSearchItemsCCType3, filterAdvancedSearchItemsCCType4,
                               filterAdvancedSearchItemsCCType5, filterAdvancedSearchItemsCCType6]
-filter.advancedSearch = filterAdvancedSearch
 
+filter.advancedSearch = filterAdvancedSearch
 results = client.media.list(filter, pager)
-#print filterAdvancedSearch
-#print filterAdvancedSearchItems
+print filterAdvancedSearch
+print filterAdvancedSearchItems
+
 #results = client.media.list(filter, pager)
 #print "objs"
 #for obj in results.getObjects():
@@ -90,3 +91,21 @@ results = client.media.list(filter, pager)
 #print results.getObjects()
 print results.getTotalCount()
 
+# Insert filtered information into CC license channel
+
+print results.getObjects()
+
+categoryEntry = Plugins.Core.KalturaCategoryEntry()
+categoryEntry.setCategoryId(44792221)
+
+
+
+for media in results.getObjects():
+    if media.getId() != entryId:
+
+
+
+
+
+        #for media in category.getId():
+    #if media.id != result
