@@ -25,7 +25,7 @@ playlist.playlistType = 10
 playlist.totalResults = 10
 
 update_stats = ""
-
+print playlist.getPlaylistContent()
 #results = client.playlist.add(
 #    playlist,
 #    update_stats)
