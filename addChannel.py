@@ -25,15 +25,17 @@ category.privacy = 1
 if category.name != "Creative Commons license":
     results = client.category.add(category)
 
-#Filter through media to find all Creative commons licence type content
+
+# Filter through media to find all Creative commons licence type content
 filter = Plugins.Core.KalturaMediaEntryFilter()
 filterAdvancedSearch = Plugins.Metadata.KalturaMetadataSearchItem()
 filterAdvancedSearch.type = 2
 filterAdvancedSearch.metadataProfileId = 7409571
-#filter = Plugins.Core.KalturaMediaEntryFilter()
-#filter.mediaTypeEqual = 5
-#filter.mediaTypeEqual = 2
-#filter.mediaTypeEqual = 5
+# filter = Plugins.Core.KalturaMediaEntryFilter()
+# filter.mediaTypeEqual = 5
+# filter.mediaTypeEqual = 2
+# filter.mediaTypeEqual = 5
+
 
 filterAdvancedSearchItems = Plugins.Core.KalturaSearchCondition()
 
@@ -62,12 +64,9 @@ filterAdvancedSearchItemsCCType6.field = "/*[local-name()='metadata']/*[local-na
 filterAdvancedSearchItemsCCType6.value = "Creative Commons - Attribution Non Commercial No Derivatives"
 
 pager = Plugins.Core.KalturaFilterPager()
-
-pager = Plugins.Core.KalturaFilterPager()
-#print filterAdvancedSearch
+# print filterAdvancedSearch
 print filterAdvancedSearchItems
-
-#print filterAdvancedSearch.items
+# print filterAdvancedSearch.items
 filterAdvancedSearch.items = [filterAdvancedSearchItemsCCType1, filterAdvancedSearchItemsCCType2,
                               filterAdvancedSearchItemsCCType3, filterAdvancedSearchItemsCCType4,
                               filterAdvancedSearchItemsCCType5, filterAdvancedSearchItemsCCType6]
@@ -88,26 +87,26 @@ print contentOfChannel
 channelContents = []
 for c in contentOfChannel.getObjects():
     channelContents.append(c.entryId)
-
 print channelContents
 
-"""for media in channelContents:
-    # if media is not in result, delete it
-    if media.getId() not in results:
-        categoryEntry = Plugins.Core.KalturaCategoryEntry()
-        categoryEntry.setCategoryId(44792221)
-        categoryEntry.entryId = media.getId()
-        client.categoryEntry.delete(categoryEntry)
-
-
-# Delete filtered information into CC license channel
-# results = categoryEntry.delete(categoryEntry.entryId, media.getId)"""
 
 ccMedia = [client.media.get("1_9xxyjomm"), client.media.get("1_zmnvh38r"), client.media.get("1_j5689kew"), client.media.get("1_y1nhebhv"), client.media.get("1_x9s50hjz"), client.media.get("1_afs38koe")]
 print contentOfChannel.getObjects()
+
+
+# Delete changed type channel entries from actual channel
+for mediaId in channelContents:
+    # if media is not in result, delete it
+    if client.media.get(mediaId) not in results.getObjects():
+        # categoryEntry = Plugins.Core.KalturaCategoryEntry()
+        # categoryEntry.setCategoryId(44792221)
+        client.categoryEntry.delete(mediaId, 44792221)
+
+# Add filtered media to the channel
 for media in ccMedia:#results.getObjects():
     if media.getId() not in channelContents:
         categoryEntry = Plugins.Core.KalturaCategoryEntry()
         categoryEntry.setCategoryId(44792221)
         categoryEntry.entryId = media.getId()
+        client.categoryEntry.add(categoryEntry)
         client.categoryEntry.add(categoryEntry)
