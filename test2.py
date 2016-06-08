@@ -97,3 +97,21 @@ client.playlist.update("1_2djt7hob", playlist1, "")
 #     update_stats)
 
 #client.playlist.delete("1_k9kjuajm")
+
+
+
+def getExistingCategory(client):
+    filter = Plugins.Core.KalturaCategoryFilter.new()
+    filter.setFullNameEqual = CATEGORY_NAME
+    results = client.category.list(filter)
+
+    return results.getObjects()[0]
+
+
+def createNewCategory(client):
+    category = Plugins.Core.KalturaCategory()
+    category.setName(CATEGORY_NAME)
+    category.setDescription = CAT_DESCRIPTION
+    category.setPrivacy(PRIVACY)
+
+    return  client.category.add(category)
