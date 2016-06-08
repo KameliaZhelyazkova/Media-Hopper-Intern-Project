@@ -21,6 +21,20 @@ media1 = client.media.get("1_aswwijmi")
 media2 = client.media.get("1_9xxyjomm")
 
 
+idToRemove = "1_j5689kew"
+playlist = client.playlist.get("1_2djt7hob")
+playlist1 = Plugins.Core.KalturaPlaylist()
+list = playlist.getPlaylistContent().split(", ")
+print list
+list.remove(idToRemove)
+print list
+print ", ".join(list)
+playlist1.setPlaylistContent(", ".join(list))
+client.playlist.update("1_2djt7hob", playlist1, "")
+
+
+
+
 """ Update existing Playlist"""
 # playlist1 = Plugins.Core.KalturaPlaylist()
 # update_stats = ""
@@ -43,18 +57,18 @@ media2 = client.media.get("1_9xxyjomm")
 
 
 
-
-""" Finding correct playlists """
-filter = Plugins.Core.KalturaPlaylistFilter()
-filter.nameEqual = "Connie Test2"
-filter.userIdEqual = "connie.crowe@ed.ac.uk" # media.getUserId()
-#pager = Plugins.Core.KalturaFilterPager()
-filterResults = client.playlist.list(filter) #, #pager)
-# print filterResults.getObjects()
-originalPlaylist = filterResults.getObjects()[0]
-updateStats = ""
-print "Found old playlist" + str(originalPlaylist.getId())
-
+#
+# F""" Finding correct playlists """
+# filter = Plugins.Core.KalturaPlaylistFilter()
+# filter.nameEqual = "Connie Test2"
+# filter.userIdEqual = "connie.crowe@ed.ac.uk" # media.getUserId()
+# #pager = Plugins.Core.KalturaFilterPager()
+# filterResults = client.playlist.list(filter) #, #pager)
+# # print filterResults.getObjects()
+# originalPlaylist = filterResults.getObjects()[0]
+# updateStats = ""
+# print "ound old playlist" + str(originalPlaylist.getId())
+#
 
 """" Adding Content """
 

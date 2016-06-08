@@ -7,6 +7,10 @@ KS_TYPE = 2
 ADMIN_SECRET = "1a7227978d8228dde2a574fac2c9b371"
 PARTNER_ID = 1817881
 
+PLAYLIST_NAME = "Test Thingy"
+DESCRIPTION = "All my Media which is licensed with a Creative Commons License"
+FREE_TEXT = ""
+
 
 # Initialise Session
 config = KalturaConfiguration(PARTNER_ID)
@@ -17,37 +21,36 @@ ks = client.generateSession(ADMIN_SECRET, USER_ID, KS_TYPE, PARTNER_ID)
 client.setKs(ks)
 
 
-PLAYLISTNAME = "Creative Commons Stuff Proper Test Thing"
-
 
 
 # Get all CC data
 """
-1_9xxyjomm, user admin
-1_zmnvh38r, user connie
-1_j5689kew, user marc
-1_y1nhebhv, marc
-1_x9s50hjz, marc
-1_afs38koe, connie
+1_afs38koe, user connie
+1_kncytozs, user connie
+1_xw612s64, user marc
+1_0k19hsqi, marc
+1_oj9khhra, stephen
+1_opaqpg82, stephen
 """
 
 
-ccMedia = [client.media.get("1_9xxyjomm"), client.media.get("1_zmnvh38r"), client.media.get("1_j5689kew"), client.media.get("1_y1nhebhv"), client.media.get("1_x9s50hjz"), client.media.get("1_afs38koe")]
+ccMedia = [client.media.get("1_afs38koe"), client.media.get("1_kncytozs"), client.media.get("1_xw612s64"), client.media.get("1_0k19hsqi"), client.media.get("1_oj9khhra"), client.media.get("1_powzieyo")]
 
 def main():
-
+    #filtered = filterCCContent()
+    #for media in filtered:
     for media in ccMedia:
         mediaId = media.getId()
         print "Processing Media Entry " + str(mediaId)
 
         # retrieve the playlist if it exists
         try:
-            playlist = getExistingPlaylist(client, PLAYLISTNAME, media.getUserId())
+            playlist = getExistingPlaylist(client, PLAYLIST_NAME, media.getUserId())
             print "Found old playlist, id: " + str(playlist.getId())
 
-        # the playlist does not yet exist
+        # create playlist if it doesn't exist
         except IndexError:
-            playlist = createNewPlaylist(client, PLAYLISTNAME, media.getUserId())
+            playlist = createNewPlaylist(client, PLAYLIST_NAME, media.getUserId())
             print "Created new playlist, id: " + str(playlist.getId())
 
         # add content if not already present
@@ -56,14 +59,17 @@ def main():
             contentToAdd = currentPlContent + ", " + mediaId
         else:
             contentToAdd = mediaId
+
         if mediaId not in currentPlContent:
-            addToPlaylist(client, playlist, contentToAdd)
-            print "Done, added " + str(mediaId) + "to " + str(playlist.getId())
+            updatePlaylist(client, contentToAdd, playlist)
+            print "Done, added " + str(mediaId) + " to " + str(playlist.getId())
+        else:
+            print "Media " + str(mediaId) + " already in playlist " + str(playlist.getId())
 
 
 
 def getExistingPlaylist(client, playlistName, userId):
-    """ Checks whether the desired playlist already exists and returns it """
+    """ Returns desired playlist, if it exists """
     filter = Plugins.Core.KalturaPlaylistFilter()
     filter.nameEqual = playlistName
     filter.userIdEqual = userId
@@ -76,18 +82,77 @@ def createNewPlaylist(client, playlistName, userId):
     """ Creates a new playlist with the specified parameters """
     playlist = Plugins.Core.KalturaPlaylist()
     playlist.setName(playlistName)
-    playlist.setDescription("All my Media which is licensed with a Creative Commons License")
+    playlist.setDescription(DESCRIPTION)
     playlist.setUserId(userId)
     playlist.setPlaylistType(3)
 
     return client.playlist.add(playlist, "")
 
 
-def addToPlaylist(client, originalPlaylist, contentToAdd):
+def updatePlaylist(client, contentToAdd, originalPlaylist):
     """ Updates playlist content """
     newPlaylist = Plugins.Core.KalturaPlaylist()
     newPlaylist.setPlaylistContent(contentToAdd)
     client.playlist.update(originalPlaylist.getId(), newPlaylist, "")
+
+
+def deleteFromPlaylist(client, contentToRemove, originalPlaylist):
+    elems = originalPlaylist.getPlaylistContent().split(", ")
+    elems.remove(contentToRemove)
+    newContent = (", ".join(elems))
+    updatePlaylist(client, newContent, originalPlaylist)
+
+
+def filterCCContent():
+    """ Returns all media which has a CC License of any kind """
+    filter = Plugins.Core.KalturaMediaEntryFilter()
+    metadataFilter = Plugins.Metadata.KalturaMetadataSearchItem()
+
+    # Type 2 = SEARCH_OR
+    metadataFilter.setType(2)
+    # Profile Id of "UoE Default" custom metadata field which we want to search through
+    metadataFilter.setMetadataProfileId(7409571)
+
+    # Setting all conditions, so all types of CC License is returned
+    conditionAttribution = Plugins.Core.KalturaSearchCondition()
+    conditionAttribution.setField("/*[local-name()='metadata']/*[local-name()='CCLicenceType']")
+    conditionAttribution.setValue("Creative Commons - Attribution")
+
+    conditionAttNoDeriv = Plugins.Core.KalturaSearchCondition()
+    conditionAttNoDeriv.setField("/*[local-name()='metadata']/*[local-name()='CCLicenceType']")
+    conditionAttNoDeriv.setValue("Creative Commons - Attribution No Derivatives")
+
+    conditionAttNonComLike = Plugins.Core.KalturaSearchCondition()
+    conditionAttNonComLike.setField("/*[local-name()='metadata']/*[local-name()='CCLicenceType']")
+    conditionAttNonComLike.setValue("Creative Commons - Attribution Non Commercial  Share A Like")
+
+    conditionLike = Plugins.Core.KalturaSearchCondition()
+    conditionLike.setField("/*[local-name()='metadata']/*[local-name()='CCLicenceType']")
+    conditionLike.setValue("Creative Commons - Attribution Share A Like")
+
+    conditionNonCom = Plugins.Core.KalturaSearchCondition()
+    conditionNonCom.setField("/*[local-name()='metadata']/*[local-name()='CCLicenceType']")
+    conditionNonCom.setValue("Creative Commons - Attribution Non Commercial")
+
+    conditionNonComNoDeriv = Plugins.Core.KalturaSearchCondition()
+    conditionNonComNoDeriv.setField("/*[local-name()='metadata']/*[local-name()='CCLicenceType']")
+    conditionNonComNoDeriv.setValue("Creative Commons - Attribution Non Commercial No Derivatives")
+
+    # Set search conditions to filter
+    metadataFilter.items = [conditionAttribution, conditionAttNoDeriv, conditionAttNonComLike,
+                            conditionLike, conditionNonCom, conditionNonComNoDeriv]
+    filter.advancedSearch = metadataFilter
+
+    return client.media.list(filter)
+
+
+def filterFreeText():
+    """ Returns media with the requested FREE_TEXT somewhere in its metadata (tags/title) """
+    filter = Plugins.Core.KalturaMediaEntryFilter()
+    filter.free_text = FREE_TEXT
+    filter.order_by = "-weight"
+    filter.advanced_search = Plugins.Core.KalturaMetadataSearchItem()
+    return client.media.list(filter)
 
 
 
