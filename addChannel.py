@@ -76,36 +76,38 @@ filter.advancedSearch = filterAdvancedSearch
 results = client.media.list(filter, pager)
 print filterAdvancedSearch
 print filterAdvancedSearchItems
-
-#results = client.media.list(filter, pager)
-#print "objs"
-#for obj in results.getObjects():
-#    print obj.getName()
-
-#print results.getTotalCount()
-
-#pager = Plugins.Core.KalturaFilterPager()
-#results = client.media.list(filter, pager)
-#for obj in results.getObjects():
- #   print obj.getName()
-#print results.getObjects()
 print results.getTotalCount()
-
-# Insert filtered information into CC license channel
-
 print results.getObjects()
 
-categoryEntry = Plugins.Core.KalturaCategoryEntry()
-categoryEntry.setCategoryId(44792221)
+filterCategory = Plugins.Core.KalturaCategoryEntryFilter()
+filterCategory.categoryIdEqual = 44792221
+
+# Creating a list for all of the content of a channel
+contentOfChannel = client.categoryEntry.list(filterCategory)
+print contentOfChannel
+channelContents = []
+for c in contentOfChannel.getObjects():
+    channelContents.append(c.entryId)
+
+print channelContents
+
+"""for media in channelContents:
+    # if media is not in result, delete it
+    if media.getId() not in results:
+        categoryEntry = Plugins.Core.KalturaCategoryEntry()
+        categoryEntry.setCategoryId(44792221)
+        categoryEntry.entryId = media.getId()
+        client.categoryEntry.delete(categoryEntry)
 
 
+# Delete filtered information into CC license channel
+# results = categoryEntry.delete(categoryEntry.entryId, media.getId)"""
 
-for media in results.getObjects():
-    if media.getId() != entryId:
-
-
-
-
-
-        #for media in category.getId():
-    #if media.id != result
+ccMedia = [client.media.get("1_9xxyjomm"), client.media.get("1_zmnvh38r"), client.media.get("1_j5689kew"), client.media.get("1_y1nhebhv"), client.media.get("1_x9s50hjz"), client.media.get("1_afs38koe")]
+print contentOfChannel.getObjects()
+for media in ccMedia:#results.getObjects():
+    if media.getId() not in channelContents:
+        categoryEntry = Plugins.Core.KalturaCategoryEntry()
+        categoryEntry.setCategoryId(44792221)
+        categoryEntry.entryId = media.getId()
+        client.categoryEntry.add(categoryEntry)
