@@ -6,15 +6,29 @@ USER_ID = "admin"
 KS_TYPE = 2
 ADMIN_SECRET = "1a7227978d8228dde2a574fac2c9b371"
 PARTNER_ID = 1817881
+SERVICE_URL = "http://www.kaltura.com/"
+# OPTIONS
+# Category Settings
+CATEGORY_NAME = "Creative Commons license"
+CAT_DESCRIPTION  = ""
+# Privacy values: ALL = 1, AUTHENTICATED_USERS = 2, MEMBERS_ONLY = 3
+PRIVACY  = 1
 
+
+#  Create a playlist for each user and add their content? [True, False]
+PLAYLIST_CREATION = True
 PLAYLIST_NAME = "Test Thingy"
-DESCRIPTION = "All my Media which is licensed with a Creative Commons License"
+PLAY_DESC = "All my Media which is licensed with a Creative Commons License"
+
+# FILTER_BY = "cc" or "freetext"
+FILTER_BY = ""
 FREE_TEXT = ""
+
 
 
 # Initialise Session
 config = KalturaConfiguration(PARTNER_ID)
-config.serviceUrl = "http://www.kaltura.com/"
+config.serviceUrl = SERVICE_URL
 client = KalturaClient(config)
 
 ks = client.generateSession(ADMIN_SECRET, USER_ID, KS_TYPE, PARTNER_ID)
@@ -38,12 +52,20 @@ ccMedia = [client.media.get("1_afs38koe"), client.media.get("1_kncytozs"), clien
 
 def main():
     #filtered = filterCCContent()
+
+    # Get Category if it exists
+        # get category id
+    # create category if it doesn't
+        # get cateogory id
+
+
     #for media in filtered:
     for media in ccMedia:
         mediaId = media.getId()
         print "Processing Media Entry " + str(mediaId)
 
         # retrieve the playlist if it exists
+        # if PLAYLIST_CREATION = True:
         try:
             playlist = getExistingPlaylist(client, PLAYLIST_NAME, media.getUserId())
             print "Found old playlist, id: " + str(playlist.getId())
@@ -67,6 +89,13 @@ def main():
             print "Media " + str(mediaId) + " already in playlist " + str(playlist.getId())
 
 
+        # if mediaId in channel and media.get(mediaId) not in filtered
+            # delete it from channel
+            # if using playlists
+                # delete it from appropriate playlist
+        # if media in not in channel
+            # add to channel
+
 
 def getExistingPlaylist(client, playlistName, userId):
     """ Returns desired playlist, if it exists """
@@ -82,7 +111,7 @@ def createNewPlaylist(client, playlistName, userId):
     """ Creates a new playlist with the specified parameters """
     playlist = Plugins.Core.KalturaPlaylist()
     playlist.setName(playlistName)
-    playlist.setDescription(DESCRIPTION)
+    playlist.setDescription(PLAY_DESC)
     playlist.setUserId(userId)
     playlist.setPlaylistType(3)
 
@@ -153,7 +182,6 @@ def filterFreeText():
     filter.order_by = "-weight"
     filter.advanced_search = Plugins.Core.KalturaMetadataSearchItem()
     return client.media.list(filter)
-
 
 
 if __name__ == "__main__":
