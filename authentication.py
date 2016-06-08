@@ -1,12 +1,17 @@
 from KalturaClient import *
 from KalturaClient import Plugins
+import json
+
 
 # session credentials
-userID = "admin"
-ks_type = 2
-admin_secret = "1a7227978d8228dde2a574fac2c9b371"
-partnerID = 1817881
 
+file = open('test.json')
+settings = json.load(file)
+
+userID = settings['userID']
+admin_secret = settings['adminSecret']
+ks_type = settings['ks_type']
+partnerID = settings['partnerID']
 
 # config
 config = KalturaConfiguration(partnerID)
@@ -38,3 +43,4 @@ print results.getObjects()[0].getName()
 
 
 print "Session Established."
+file.close()
