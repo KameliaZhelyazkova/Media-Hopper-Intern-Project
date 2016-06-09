@@ -39,9 +39,9 @@ run the following command into the command prompt:
 
 You can change the Session, Channel, Playlist and Filter settings by opening settings.json
 file in the KalturaClient. This is happening by entering for each key in the sub-dictionary - the
-corresponding value to each of the corresponding fields into each dictionary.
-For instance, channelName can be changed to new one by entering a proffered naming (content) after the colon within the
-quotation marks.
+corresponding value for each of the corresponding fields into each dictionary.
+For instance, channelName can be modified to new one by entering a content (preferred naming) after
+the colons within the quotation marks.
 
 
 
