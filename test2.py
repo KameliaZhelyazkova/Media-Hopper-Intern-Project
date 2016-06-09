@@ -115,3 +115,12 @@ def createNewCategory(client):
     category.setPrivacy(PRIVACY)
 
     return  client.category.add(category)
+
+
+
+from creationScript import *
+file = open('settings.json')
+settings = json.load(file)
+file.close()
+client = createSession(settings)
+

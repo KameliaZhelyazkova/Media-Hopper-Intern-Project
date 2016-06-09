@@ -5,15 +5,15 @@ of Edinburgh’s video platform Media Hopper.
 
 == DESCRIPTION ==
 
-The aim is to create a channel populated automatically with data
+The aim is to create a channel automatically populated with data
 specified by a distinct license type, in this instance creative commons
 license type. This would result that every time a user selects a creative
-commons license and publishescontent that content will be automatically
+commons license and publishes content that content will be automatically
 added to the channel.
 
-Another functionality is to further develop the concept by creating a;unique
-playlist inside the channel for each user who generates creative commons
-licensed content. This will allow academics to embed a playlist of all
+Another instance of it's functionality is to further develop the concept by
+creating a unique playlist inside the channel for each user who generates creative
+commons licensed content. This will allow academics to embed a playlist of all
 their creative commons content in any website they wish.
 
 
@@ -34,5 +34,15 @@ default with python:
 After making sure you have the modules listed under the 'external dependencies' installed,
 run the following command into the command prompt:
 >> python creation_script.py
+
+== CHANGE OF SETTINGS ==
+
+You can change the Session, Channel, Playlist and Filter settings by opening settings.json
+file in the KalturaClient. This is happening by entering for each key in the sub-dictionary - the
+corresponding value to each of the corresponding fields into each dictionary.
+For instance, channelName can be changed to new one by entering a proffered naming (content) after the colon within the
+quotation marks.
+
+
 
 

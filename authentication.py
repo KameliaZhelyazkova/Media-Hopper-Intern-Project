@@ -5,7 +5,7 @@ import json
 
 # session credentials
 
-file = open('test.json')
+file = open('settings.json')
 settings = json.load(file)
 
 userID = settings['userID']

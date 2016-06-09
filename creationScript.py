@@ -7,7 +7,7 @@ import json
 def main():
 
     # Load json file
-    file = open('test.json')
+    file = open('settings.json')
     settings = json.load(file)
     file.close()
 
@@ -217,4 +217,3 @@ def addToChannel(client, channelID, mediaID):
 
 if __name__ == "__main__":
     main()
-
