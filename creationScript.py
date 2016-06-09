@@ -34,6 +34,11 @@ def main():
     else:
         raise ValueError("Unexpected filterBy value. Expected values are 'CC' or 'freeText'.")
 
+    print filteredMedia.getTotalCount()
+    for f in filteredMedia.getObjects():
+        print f.getId()
+
+    print (client.media.get("1_hz70g5ky") in filteredMedia.getObjects())
 
     # Get Channel ID from existing channel, or create a new one
     try:
@@ -72,9 +77,11 @@ def main():
         if mediaID not in channelContents:
             addToChannel(client, channelID, mediaID)
 
+    ids = [f.getId() for f in filteredMedia.getObjects()]
     for mediaId in channelContents:
-        if client.media.get(mediaId) not in filteredMedia.getObjects():
+        if mediaId not in ids:
             client.categoryEntry.delete(mediaId, channelID)
+            print "rm" + str(mediaId)
             if playlistCreation:
                 deleteFromPlaylist(client, mediaId, playlist)
 
@@ -156,7 +163,6 @@ def getExistingChannel(client, channelName):
     return results.getObjects()[0]
 
 
-
 def createNewChannel(client, channelName, channelDescription, channelPrivacy):
     category = Plugins.Core.KalturaCategory()
     category.setName(channelName)
@@ -204,7 +210,8 @@ def updatePlaylist(client, contentToAdd, originalPlaylist):
 
 def deleteFromPlaylist(client, contentToRemove, originalPlaylist):
     elems = originalPlaylist.getPlaylistContent().split(", ")
-    elems.remove(contentToRemove)
+    if contentToRemove in elems:
+        elems.remove(contentToRemove)
     newContent = (", ".join(elems))
     return updatePlaylist(client, newContent, originalPlaylist)
 
