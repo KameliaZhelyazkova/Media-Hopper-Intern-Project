@@ -7,7 +7,7 @@ import json
 def main():
 
     # Load json file
-    file = open('test.json')
+    file = open('settings.json')
     settings = json.load(file)
     file.close()
 
@@ -64,7 +64,7 @@ def main():
                 contentToAdd = mediaID
 
             if mediaID not in currentPlContent:
-                updatePlaylist(client, contentToAdd, playlist)
+                playlist = updatePlaylist(client, contentToAdd, playlist)
                 print "Done, added " + str(mediaID) + " to " + str(playlist.getId())
             else:
                 print "Media " + str(mediaID) + " already in playlist " + str(playlist.getId())
@@ -143,9 +143,9 @@ def filterCCContent(client):
 def filterFreeText(client, freeText):
     """ Returns media with the requested FREE_TEXT somewhere in its metadata (tags/title) """
     filter = Plugins.Core.KalturaMediaEntryFilter()
-    filter.setFreeText = freeText
+    filter.setFreeText(freeText)
     filter.orderBy = "-weight"
-    filter.advancedSearch = Plugins.Core.KalturaMetadataSearchItem()
+    filter.advancedSearch = Plugins.Metadata.KalturaMetadataSearchItem()
     return client.media.list(filter)
 
 
@@ -154,6 +154,7 @@ def getExistingChannel(client, channelName):
     filter.setFullNameEqual(channelName)
     results = client.category.list(filter)
     return results.getObjects()[0]
+
 
 
 def createNewChannel(client, channelName, channelDescription, channelPrivacy):
@@ -198,13 +199,14 @@ def updatePlaylist(client, contentToAdd, originalPlaylist):
     newPlaylist = Plugins.Core.KalturaPlaylist()
     newPlaylist.setPlaylistContent(contentToAdd)
     client.playlist.update(originalPlaylist.getId(), newPlaylist, "")
+    return getExistingPlaylist(client, originalPlaylist.getName(), originalPlaylist.getUserId())
 
 
 def deleteFromPlaylist(client, contentToRemove, originalPlaylist):
     elems = originalPlaylist.getPlaylistContent().split(", ")
     elems.remove(contentToRemove)
     newContent = (", ".join(elems))
-    updatePlaylist(client, newContent, originalPlaylist)
+    return updatePlaylist(client, newContent, originalPlaylist)
 
 
 def addToChannel(client, channelID, mediaID):
