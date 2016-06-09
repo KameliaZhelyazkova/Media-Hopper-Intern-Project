@@ -34,12 +34,7 @@ def main():
     else:
         raise ValueError("Unexpected filterBy value. Expected values are 'CC' or 'freeText'.")
 
-    print filteredMedia.getTotalCount()
-    for f in filteredMedia.getObjects():
-        print f.getId()
-
-    print (client.media.get("1_hz70g5ky") in filteredMedia.getObjects())
-
+    #print filteredMedia.getTotalCount()
     # Get Channel ID from existing channel, or create a new one
     try:
         channel = getExistingChannel(client, channelName)
@@ -50,16 +45,15 @@ def main():
 
     for media in filteredMedia.getObjects():
         mediaID = media.getId()
-        print "Processing Media Entry " + str(mediaID)
-
+        #print "Processing Media Entry " + str(mediaID)
         if playlistCreation:
             # Get playlist if it exists, or create a new one
             try:
                 playlist = getExistingPlaylist(client, playlistName, media.getUserId())
-                print "Found old playlist, id: " + str(playlist.getId())
+                # print "Found old playlist, id: " + str(playlist.getId())
             except IndexError:
                 playlist = createNewPlaylist(client, playlistName, media.getUserId(), playlistDesc)
-                print "Created new playlist, id: " + str(playlist.getId())
+                # print "Created new playlist, id: " + str(playlist.getId())
 
             # add content if not already present
             currentPlContent = playlist.getPlaylistContent()
@@ -70,9 +64,7 @@ def main():
 
             if mediaID not in currentPlContent:
                 playlist = updatePlaylist(client, contentToAdd, playlist)
-                print "Done, added " + str(mediaID) + " to " + str(playlist.getId())
-            else:
-                print "Media " + str(mediaID) + " already in playlist " + str(playlist.getId())
+                # print "Done, added " + str(mediaID) + " to " + str(playlist.getId())
 
         if mediaID not in channelContents:
             addToChannel(client, channelID, mediaID)
@@ -81,14 +73,16 @@ def main():
     for mediaId in channelContents:
         if mediaId not in ids:
             client.categoryEntry.delete(mediaId, channelID)
-            print "rm" + str(mediaId)
+            #print "rm" + str(mediaId)
             if playlistCreation:
+                # print "rm from playlist"
                 deleteFromPlaylist(client, mediaId, playlist)
 
 
 
 
 def createSession(settings):
+    """ Connects to Kaltura Server and returns the authenticated client object"""
     userID = settings["sessionSettings"]["userID"]
     ksType = settings["sessionSettings"]["ksType"]
     adminSecret = settings["sessionSettings"]["adminSecret"]
@@ -105,7 +99,7 @@ def createSession(settings):
 
 
 def filterCCContent(client):
-    """ Returns all media which has a CC License of any kind """
+    """ Returns a <KalturaMediaListResponse> containing all media which has a CC License of any kind """
     filter = Plugins.Core.KalturaMediaEntryFilter()
     metadataFilter = Plugins.Metadata.KalturaMetadataSearchItem()
 
@@ -114,7 +108,7 @@ def filterCCContent(client):
     # Profile Id of "UoE Default" custom metadata field which we want to search through
     metadataFilter.setMetadataProfileId(7409571)
 
-    # Setting all conditions, so all types of CC License is returned
+    # Setting all conditions, so all types of CC License are returned
     conditionAttribution = Plugins.Core.KalturaSearchCondition()
     conditionAttribution.setField("/*[local-name()='metadata']/*[local-name()='CCLicenceType']")
     conditionAttribution.setValue("Creative Commons - Attribution")
@@ -148,7 +142,7 @@ def filterCCContent(client):
 
 
 def filterFreeText(client, freeText):
-    """ Returns media with the requested FREE_TEXT somewhere in its metadata (tags/title) """
+    """ Returns <KalturaMediaListResponse> of the media which have the requested freeText in their metadata (tags/title) """
     filter = Plugins.Core.KalturaMediaEntryFilter()
     filter.setFreeText(freeText)
     filter.orderBy = "-weight"
@@ -157,6 +151,7 @@ def filterFreeText(client, freeText):
 
 
 def getExistingChannel(client, channelName):
+    """ Returns requested channel, if it exists. Will throw an IndexError otherwise. """
     filter = Plugins.Core.KalturaCategoryFilter()
     filter.setFullNameEqual(channelName)
     results = client.category.list(filter)
@@ -164,6 +159,7 @@ def getExistingChannel(client, channelName):
 
 
 def createNewChannel(client, channelName, channelDescription, channelPrivacy):
+    """ Creates and returns a new channel with the specified parameters """
     category = Plugins.Core.KalturaCategory()
     category.setName(channelName)
     category.setDescription(channelDescription)
@@ -172,6 +168,7 @@ def createNewChannel(client, channelName, channelDescription, channelPrivacy):
 
 
 def getChannelContents(client, channelID):
+    """ Returns a list of the ids of the media in the channel, ie. the contents of hte channel """
     filterCategory = Plugins.Core.KalturaCategoryEntryFilter()
     filterCategory.setCategoryIdEqual(channelID)
     catCont = client.categoryEntry.list(filterCategory)
@@ -182,7 +179,7 @@ def getChannelContents(client, channelID):
 
 
 def getExistingPlaylist(client, playlistName, userId):
-    """ Returns desired playlist, if it exists """
+    """ Returns requested playlist, if it exists. Will throw an IndexError otherwise. """
     filter = Plugins.Core.KalturaPlaylistFilter()
     filter.setNameEqual(playlistName)
     filter.setUserIdEqual(userId)
@@ -191,7 +188,7 @@ def getExistingPlaylist(client, playlistName, userId):
 
 
 def createNewPlaylist(client, playlistName, userId, playlistDesc):
-    """ Creates a new playlist with the specified parameters """
+    """ Creates and returns a new playlist with the specified parameters """
     playlist = Plugins.Core.KalturaPlaylist()
     playlist.setName(playlistName)
     playlist.setDescription(playlistDesc)
@@ -201,7 +198,7 @@ def createNewPlaylist(client, playlistName, userId, playlistDesc):
 
 
 def updatePlaylist(client, contentToAdd, originalPlaylist):
-    """ Updates playlist content """
+    """ Updates playlist content and returns updated playlist """
     newPlaylist = Plugins.Core.KalturaPlaylist()
     newPlaylist.setPlaylistContent(contentToAdd)
     client.playlist.update(originalPlaylist.getId(), newPlaylist, "")
@@ -209,6 +206,7 @@ def updatePlaylist(client, contentToAdd, originalPlaylist):
 
 
 def deleteFromPlaylist(client, contentToRemove, originalPlaylist):
+    """ Deletes contentToRemove from the playlist originalPlaylist and returns the updated playlist"""
     elems = originalPlaylist.getPlaylistContent().split(", ")
     if contentToRemove in elems:
         elems.remove(contentToRemove)
@@ -217,6 +215,7 @@ def deleteFromPlaylist(client, contentToRemove, originalPlaylist):
 
 
 def addToChannel(client, channelID, mediaID):
+    """ Adds the media corresponding to mediaId to the channel """
     categoryEntry = Plugins.Core.KalturaCategoryEntry()
     categoryEntry.setCategoryId(channelID)
     categoryEntry.setEntryId(mediaID)

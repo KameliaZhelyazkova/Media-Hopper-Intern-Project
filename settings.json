@@ -7,7 +7,7 @@
 
   "playlistSettings": {"playlistCreation": true, "playlistName": "Connie's Testing", "playlistDesc": "No"},
 
-  "filterSettings": {"filterBy":"freeText","freeText":"media"}
+  "filterSettings": {"filterBy":"CC","freeText":"media"}
 
 
 }
