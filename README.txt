@@ -10,7 +10,7 @@ by a distinct license type, in this instance creative commons license type.
 This would result that every time a user selects a creative commons license
 and publishes content that content will be automatically added to the channel.
 
-Another instance of it's functionality is to create a unique playlist inside
+Another instance of its functionality is to create a unique playlist inside
 the channel for each user who generates creative commons licensed content.
 This allows embedding a playlist of all creative commons content in any website of a choice.
 
@@ -55,13 +55,22 @@ settings.json file in the KalturaClient. This is happening by entering for each
 key in the sub-dictionary the desired value for the corresponding fields you would
 wish to change. For instance, channelName can be modified to a new one by entering
 content (preferred naming) after the colons within the quotation marks.cc
-Example code: "channelSettings": {"channelName": "Ada Lovelace Day",
-"channelDescription": "Ada Lovelace Day in 2016 will be on Tuesday 11 October...",
-"channelPrivacy": 1}.
+
+Example code:
+"channelSettings": {"channelName": "Ada Lovelace Day",
+                    "channelDescription": "Ada Lovelace Day in 2016 will be on Tuesday 11 October...",
+                    "channelPrivacy": 1}.
+
+
 
 In addition ksType can hold values: 0 - USER and 2 - ADMIN, channelPrivacy: 1 - ALL, 2 - AUTHENTICATED_USERS,
-3 - MEMBERS_ONLY. Analogically, for any other values of an attribute, you can check
-the Kaltura's API documentation on: http://www.kaltura.com/api_v3/testmeDoc/.
+3 - MEMBERS_ONLY. "playlistCreation" should be set to true if you wish to
+generate playlists as explained above, and to false otherwise. "filterBy" takes the value "CC" if you want to
+filter by Creative Commons license type, and "freeText" to filter by keywords.
+In the later case, specify the keywords in "freeText".
+
+Analogically, for any other values of an attribute, you can check the Kaltura's API
+documentation on: http://www.kaltura.com/api_v3/testmeDoc/.
 
 
 
