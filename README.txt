@@ -36,20 +36,24 @@ run the following command into the command prompt:
 
 == CHANGE OF SETTINGS ==
 {
-  "sessionSettings": {"userID": "admin", "ksType": 2,
+  "sessionSettings": {"userID": "admin",
+                      "ksType": 2,
                       "adminSecret": "1a7227978d8228dde2a574fac2c9b371",
-                      "partnerID": 1817881,"serviceUrl": "http://www.kaltura.com/"},
+                      "partnerID": 1817881,
+                      "serviceUrl": "http://www.kaltura.com/"},
 
-  "channelSettings": {"channelName": "Ada Lovelace Day", "channelDescription": "Woo",
-  "channelPrivacy": 1},
+  "channelSettings": {"channelName": "Ada Lovelace Day",
+                      "channelDescription": "Woo",
+                      "channelPrivacy": 1},
 
-  "playlistSettings": {"playlistCreation": true, "playlistName": "Ada Lovelace Day in 2016
-   will be on Tuesday 11 October...", "playlistDesc": "No"},
+  "filterSettings": {"filterBy":"CC",
+                     "freeText":"media"}
 
-  "filterSettings": {"filterBy":"CC","freeText":"media"}
-
-
+  "playlistSettings": {"playlistCreation": true,
+                       "playlistName": "Ada Lovelace Day in 2016 will be on Tuesday 11 October...",
+                       "playlistDesc": "No"},
 }
+
 You can change the Session, Channel, Playlist and Filter settings by opening
 settings.json file in the KalturaClient. This is happening by entering for each
 key in the sub-dictionary the desired value for the corresponding fields you would
