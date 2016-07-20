@@ -1,24 +1,24 @@
 {
 
-  "sessionSettings": {"userID": "admin",
-                      "ksType": 2,
-                      "adminSecret": "1a7227978d8228dde2a574fac2c9b371",
-                      "partnerID": 1817881,
-                      "serviceUrl": "http://www.kaltura.com/"},
+  "session_settings": {"user_id": "admin",
+                      "ks_type": 2,
+                      "admin_secret": "1a7227978d8228dde2a574fac2c9b371",
+                      "partner_id": 1817881,
+                      "service_url": "http://www.kaltura.com/"},
 
 
-  "channelSettings": {"channelName": "Connie Test Channel",
-                      "channelDescription": "Woo",
-                      "channelPrivacy": 1},
+  "channel_settings": {"channel_name": "Connie",
+                      "channel_description": "Woo",
+                      "channel_privacy": 1},
 
 
-  "filterSettings": {"filterBy":"CC",
-                     "freeText":"media"},
+  "filter_settings": {"filter_by":"CC",
+                     "free_text":"media"},
 
 
-  "playlistSettings": {"playlistCreation": true,
-                       "playlistName": "Connie's Testing",
-                       "playlistDesc": "No"}
+  "playlist_settings": {"playlist_creation": true,
+                       "playlist_name": "Connie's Testing",
+                       "playlist_desc": "No"}
 
 
 }
