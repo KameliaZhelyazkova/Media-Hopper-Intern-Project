@@ -3,7 +3,7 @@ import json
 
 
 def main():
-    file = open('/home/mediamigrator/django/channel_creation/settings.json')
+    file = open('settings.json')#'/home/mediamigrator/django/channel_creation/settings.json')
     settings = json.load(file)
     file.close()
 
@@ -19,25 +19,42 @@ def main():
 
     client = create_session(settings)
 
-    # Filter media based on filter settings
-    filter_by = settings["filter_settings"]["filter_by"]
-    if (filter_by == "CC"):
-        filtered_media = filter_CC_content(client)
-    elif (filter_by == "free_text"):
-        filtered_media = filter_free_text(client, settings["filter_settings"]["free_text"])
-    else:
-        raise ValueError("Unexpected filter_by value. Got: " + filter_by + ". Expected: 'CC' or 'free_text'.")
-    print filtered_media.getTotalCount()
-
     # Get Channel ID from existing channel, or create a new one
     try:
         channel = get_existing_channel(client, channel_name)
     except IndexError:
         channel = create_new_channel(client, channel_name, channel_description, channel_privacy)
     channel_id = channel.getId()
-    channel_content = get_channel_content(client, channel_id)
+    results = get_channel_content(client, channel_id, 1)
+    channel_content = results[0]
+    index = (results[1] / 500)
+    if index > 0:
+        i = 2
+        while i <= index + 1:
+            channel_content = channel_content + get_channel_content(client, channel_id, i)[0]
+            i = i + 1
 
-    for media in filtered_media.getObjects():
+    # Filter media based on filter settings
+    filter_by = settings["filter_settings"]["filter_by"]
+    if (filter_by == "CC"):
+        filtered_media = filter_CC_content(client, 1)
+    elif (filter_by == "free_text"):
+        filtered_media = filter_free_text(client, settings["filter_settings"]["free_text"], 1)
+    else:
+        raise ValueError("Unexpected filter_by value. Got: " + filter_by + ". Expected: 'CC' or 'free_text'.")
+    index = (filtered_media.getTotalCount() / 500)
+    media_list = filtered_media.getObjects()
+    if index > 0:
+        i = 2
+        while i <= index + 1:
+            if (filter_by == "CC"):
+                media_list = media_list + filter_CC_content(client, i).getObjects()
+            else:
+                media_list = media_list + filter_free_text(client, i).getObjects()
+            i = i + 1
+
+    print len(media_list)
+    for media in media_list:
         media_id = media.getId()
         print "Processing Media Entry " + str(media_id)
         if playlist_creation:
@@ -62,16 +79,13 @@ def main():
         if media_id not in channel_content:
             add_to_channel(client, channel_id, media_id)
 
-    ids = [f.getId() for f in filtered_media.getObjects()]
+    ids = [f.getId() for f in media_list]
     for media_ID in channel_content:
         if media_ID not in ids:
             client.categoryEntry.delete(media_ID, channel_id)
-            print "rm" + str(media_ID)
             if playlist_creation:
-                print "rm from playlist"
+                playlist = get_existing_playlist(client, playlist_name, client.media.get(media_ID).getUserId())
                 delete_from_playlist(client, media_ID, playlist)
-
-
 
 
 def create_session(settings):
@@ -91,7 +105,7 @@ def create_session(settings):
     return client
 
 
-def filter_CC_content(client):
+def filter_CC_content(client, page_index):
     """ Returns a <KalturaMediaListResponse> containing all media which has a CC License of any kind """
     filter = Plugins.Core.KalturaMediaEntryFilter()
     metadata_filter = Plugins.Metadata.KalturaMetadataSearchItem()
@@ -131,22 +145,30 @@ def filter_CC_content(client):
                             condition_like, condition_non_com, condition_non_com_no_deriv]
     filter.advancedSearch = metadata_filter
 
-    return client.media.list(filter)
+    pager = Plugins.Core.KalturaFilterPager()
+    pager.setPageSize(500)
+    pager.setPageIndex(page_index)
+
+    return client.media.list(filter, pager)
 
 
-def filter_free_text(client, free_text):
+def filter_free_text(client, free_text, page_index):
     """ Returns <KalturaMediaListResponse> of the media which have the requested freeText in their metadata (tags/title) """
     filter = Plugins.Core.KalturaMediaEntryFilter()
     filter.setFreeText(free_text)
     filter.orderBy = "-weight"
     filter.advancedSearch = Plugins.Metadata.KalturaMetadataSearchItem()
-    return client.media.list(filter)
+    pager = Plugins.Core.KalturaFilterPager()
+    pager.setPageSize(500)
+    pager.setPageIndex(page_index)
+
+    return client.media.list(filter, pager)
 
 
 def get_existing_channel(client, channel_name):
     """ Returns requested channel, if it exists. Will throw an IndexError otherwise. """
     filter = Plugins.Core.KalturaCategoryFilter()
-    filter.setFullNameEqual("MediaSpace>site>channels>" + channel_name)
+    filter.setFullNameEqual("MediaSpace>site>galleries>" + channel_name)
     results = client.category.list(filter)
     return results.getObjects()[0]
 
@@ -155,21 +177,27 @@ def create_new_channel(client, channel_name, channel_description, channel_privac
     """ Creates and returns a new channel with the specified parameters """
     category = Plugins.Core.KalturaCategory()
     category.setName(channel_name)
-    category.setParentId(23880051)
+    category.setParentId(23880061)
     category.setDescription(channel_description)
     category.setPrivacy(channel_privacy)
     return client.category.add(category)
 
 
-def get_channel_content(client, channel_id):
+def get_channel_content(client, channel_id, page_index):
     """ Returns a list of the ids of the media in the channel, ie. the contents of the channel """
     filter_category = Plugins.Core.KalturaCategoryEntryFilter()
     filter_category.setCategoryIdEqual(channel_id)
-    cat_cont = client.categoryEntry.list(filter_category)
+
+    pager = Plugins.Core.KalturaFilterPager()
+    pager.setPageSize(500)
+    pager.setPageIndex(page_index)
+
+    cat_cont = client.categoryEntry.list(filter_category, pager)
+
     channel_contents = []
     for media in cat_cont.getObjects():
-        channel_contents.append(media.entryId)
-    return channel_contents
+        channel_contents.append(media.getEntryId())
+    return channel_contents, cat_cont.getTotalCount()
 
 
 def get_existing_playlist(client, playlist_name, user_id):
@@ -202,10 +230,18 @@ def update_playlist(client, content_to_add, original_playlist):
 def delete_from_playlist(client, content_to_remove, original_playlist):
     """ Deletes contentToRemove from the playlist originalPlaylist and returns the updated playlist"""
     elems = original_playlist.getPlaylistContent().split(", ")
+    print elems
+    print content_to_remove in elems
     if content_to_remove in elems:
         elems.remove(content_to_remove)
     new_content = (", ".join(elems))
-    return update_playlist(client, new_content, original_playlist)
+    print new_content
+    # update_playlist(client, new_content, original_playlist)
+
+    new_playlist = Plugins.Core.KalturaPlaylist()
+    new_playlist.setPlaylistContent(new_content)
+    client.playlist.update(original_playlist.getId(), new_playlist, "")
+    return get_existing_playlist(client, original_playlist.getName(), original_playlist.getUserId())
 
 
 def add_to_channel(client, channel_id, media_id):

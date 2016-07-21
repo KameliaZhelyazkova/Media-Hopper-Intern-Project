@@ -7,18 +7,18 @@
                       "service_url": "http://www.kaltura.com/"},
 
 
-  "channel_settings": {"channel_name": "Connie",
-                      "channel_description": "Woo",
+  "channel_settings": {"channel_name": "Connie Cron Test",
+                      "channel_description": "This should hopefully have 70 entries by tomorrow.",
                       "channel_privacy": 1},
 
 
   "filter_settings": {"filter_by":"CC",
-                     "free_text":"media"},
+                     "free_text":""},
 
 
   "playlist_settings": {"playlist_creation": true,
-                       "playlist_name": "Connie's Testing",
-                       "playlist_desc": "No"}
+                       "playlist_name": "Connie's Cron Test",
+                       "playlist_desc": "Many playlists hopefully."}
 
 
 }
