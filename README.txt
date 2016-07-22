@@ -24,8 +24,15 @@ Further information can be found in the Kaltura Client README.
 
 
 == USAGE ==
-Run the following in the command prompt:
->> python creation_script.py
+The project runs every day at 5am and 7pm.
+To run it manually, first download the project folder and ensure that you have all the external dependencies installed.
+You can change the run settings by following the instructions in the section below.
+In the "creation_script.py" file, please ensure that the first line of the main function has been provided with the
+correct path to the "settings.json" file. It should read:
+    file = open('PATH/TO/settings.json')
+
+From the command line, you can then run:
+    $ python creation_script.py
 
 
 == CHANGING THE SETTINGS ==

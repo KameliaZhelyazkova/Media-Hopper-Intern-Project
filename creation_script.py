@@ -3,7 +3,8 @@ import json
 
 
 def main():
-    file = open('settings.json')#'/home/mediamigrator/django/channel_creation/settings.json')
+    file = open('settings.json')
+    # file = open('/home/mediamigrator/django/channel_creation/settings.json')
     settings = json.load(file)
     file.close()
 
