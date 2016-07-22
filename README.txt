@@ -1,77 +1,74 @@
 == MEDIA HOPPER INTERN PROJECT ==
 
-The aspiration of this project is to extend the capability of the University of Edinburgh’s
-video platform Media Hopper.
+The goal of this project is to extend the capability of the University of Edinburgh’s video platform Media Hopper.
 
 
 == DESCRIPTION ==
-The aim is to create a channel automatically populated with data specified either by keywords in
-the title/tags of the data, or by a distinct license type, in this instance Creative Commons license type.
-This would result that every time a user selects a Creative Commons license and publishes content,
-it will be automatically added to the channel.
+The aim is to create a channel and automatically populate it with data specified either by keywords in its title/tags,
+or by a distinct licence type, in this instance the Creative Commons licence.
+As a result, every time a user selects a Creative Commons licence and publishes content it will be automatically
+added to the channel.
 
-Another instance of its functionality is to create a unique playlist inside the channel for each user
-who generates Creative Commons licensed content. This allows embedding a playlist of all of a user's
- Creative Commons content in any website of their choice.
+Another instance of its functionality is to create a unique playlist for each user containing their Creative Commons
+licenced content. This allows the user to embed a playlist of all their Creative Commons content in
+any website of their choice.
 
 
 == DEPENDENCIES ==
-Uses the Kaltura Python Client Library: http://www.kaltura.com/api_v3/testme/client-libs.php
-This can be found in the "KalturaClient" directory.
-
-
-== EXTERNAL DEPENDENCIES ==
-The API library depends on the following python modules that are not included by default with python:
- - setuptools - can be downloaded from https://pypi.python.org/pypi/setuptools
- - poster - can be downloaded from https://pypi.python.org/pypi/poster/
-	installed by running: python setup.py install
+The project uses the Kaltura Python Client Library: http://www.kaltura.com/api_v3/testme/client-libs.php
+This library must first be installed, following the instructions contained in its README (see above link).
+Please note that the library itself has certain external dependencies:
+    - setuptools - can be downloaded from https://pypi.python.org/pypi/setuptools
+    - poster - can be downloaded from https://pypi.python.org/pypi/poster/
+Further information can be found in the Kaltura Client README.
 
 
 == USAGE ==
-After making sure you have the modules listed under the 'external dependencies' installed,
-run the following in the command prompt:
+Run the following in the command prompt:
 >> python creation_script.py
 
 
-== CHANGE OF SETTINGS ==
+== CHANGING THE SETTINGS ==
+
 {
-  "sessionSettings": {"userID": "admin",
-                      "ksType": 2,
-                      "adminSecret": "Set me to a secret password",
-                      "partnerID": 00000000,
-                      "serviceUrl": "http://www.kaltura.com/"},
+  "session_settings": {"user_id": "admin",
+                      "ks_type": 2,
+                      "admin_secret": "Set to admin secret",
+                      "partner_id": XXXXXXXX,
+                      "service_url": "http://www.kaltura.com/"},
 
-  "channelSettings": {"channelName": "Ada Lovelace Day",
-                      "channelDescription": "Woo",
-                      "channelPrivacy": 1},
+  "channel_settings": {"channel_name": "Test Channel",
+                      "channel_description": "Enter channel description here.",
+                      "channel_privacy": 1},
 
-  "filterSettings": {"filterBy":"CC",
-                     "freeText":"media"}
+  "filter_settings": {"filter_by":"CC",
+                     "free_text":"Enter free text to filter by here."},
 
-  "playlistSettings": {"playlistCreation": true,
-                       "playlistName": "Ada Lovelace Day in 2016 will be on Tuesday 11 October...",
-                       "playlistDesc": "No"},
+  "playlist_settings": {"playlist_creation": true,
+                       "playlist_name": "Test Playlist",
+                       "playlist_desc": "Enter playlist description here."}
 }
 
-1. Partner ID and Administrator secret can be found on http://kmc.kaltura.com/ --> Settings --> Integration Settings.
 
-2. You can change the Session, Channel, Playlist and Filter settings by modifying "settings.json" file.
-This is happening by entering for each key in the sub-dictionary the desired value for the corresponding
-fields you would wish to change. For instance, "channelName" can be modified to a new one by entering
-content (preferred naming) after the colons within the quotation marks.
+1. You can change the session, channel, playlist and filter settings by modifying "settings.json" file.
+To do so, enter the desired value for the field you wish to change next to the corresponding key in the sub-dictionary.
+For instance, "channel_name" can be modified to a new one by entering content (preferred naming) after the colons
+within the quotation marks.
 
 Example code:
-"channelSettings": {"channelName": "Ada Lovelace Day",
-                    "channelDescription": "Ada Lovelace Day in 2016 will be on Tuesday 11 October...",
-                    "channelPrivacy": 1}.
+"channel_settings": {"channel_name": "Ada Lovelace Day",
+                    "channel_description": "Ada Lovelace Day in 2016 will be on Tuesday 11 October...",
+                    "channel_privacy": 1}.
 
+2. "partner_id" and "admin_secret" can be found on http://kmc.kaltura.com/ --> Settings --> Integration Settings.
 
-In addition "ksType" can hold values: 0 (USER) or 2 (ADMIN), "channelPrivacy": 1 (ALL), 2 (AUTHENTICATED_USERS)
-or 3 (MEMBERS_ONLY). "playlistCreation" should be set to true if you wish to generate playlists as explained above,
-and to false otherwise. "filterBy" takes the value "CC" if you want to filter by Creative Commons license type,
-and "freeText" to filter by keywords. In the later case, specify the keywords in "freeText".
+3. "ks_type" can take the values: 0 (USER) or 2 (ADMIN), "channel_privacy": 1 (ALL), 2 (AUTHENTICATED_USERS)
+or 3 (MEMBERS_ONLY).
+"playlist_creation" should be set to true if you wish to generate playlists as explained above, and to false otherwise.
+"filter_by" takes the value "CC" if you want to filter by Creative Commons licence type,
+and "free_text" to filter by keywords. In the latter case, specify the keywords in "free_text".
 
-3. Analogically, for any other values of an attribute, you can check the Kaltura's API documentation
+4. For any other values of an attribute, you can check Kaltura's API documentation
 on: http://www.kaltura.com/api_v3/testmeDoc/.
 
 
