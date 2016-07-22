@@ -11,23 +11,22 @@ def main():
     channel_name = settings["channel_settings"]["channel_name"]
     channel_description = settings["channel_settings"]["channel_description"]
     channel_privacy = settings["channel_settings"]["channel_privacy"]
-
     # Playlist Settings
     playlist_name = settings["playlist_settings"]["playlist_name"]
     playlist_desc = settings["playlist_settings"]["playlist_desc"]
     playlist_creation = settings["playlist_settings"]["playlist_creation"]
 
     client = create_session(settings)
-
     # Get Channel ID from existing channel, or create a new one
     try:
         channel = get_existing_channel(client, channel_name)
     except IndexError:
         channel = create_new_channel(client, channel_name, channel_description, channel_privacy)
     channel_id = channel.getId()
-    results = get_channel_content(client, channel_id, 1)
-    channel_content = results[0]
-    index = (results[1] / 500)
+    # Get all channel contents by looping over all result pages. Because Kaltura is weird.
+    contents1 = get_channel_content(client, channel_id, 1)
+    channel_content = contents1[0]
+    index = (contents1[1] / 500)
     if index > 0:
         i = 2
         while i <= index + 1:
@@ -42,6 +41,7 @@ def main():
         filtered_media = filter_free_text(client, settings["filter_settings"]["free_text"], 1)
     else:
         raise ValueError("Unexpected filter_by value. Got: " + filter_by + ". Expected: 'CC' or 'free_text'.")
+    # Get all media entries by looping over all result pages
     index = (filtered_media.getTotalCount() / 500)
     media_list = filtered_media.getObjects()
     if index > 0:
@@ -53,18 +53,15 @@ def main():
                 media_list = media_list + filter_free_text(client, i).getObjects()
             i = i + 1
 
-    print len(media_list)
+    print "Found " + str(len(media_list)) + " entries."
     for media in media_list:
         media_id = media.getId()
         print "Processing Media Entry " + str(media_id)
         if playlist_creation:
             try:
                 playlist = get_existing_playlist(client, playlist_name, media.getUserId())
-                print "Found old playlist, id: " + str(playlist.getId())
             except IndexError:
                 playlist = create_new_playlist(client, playlist_name, media.getUserId(), playlist_desc)
-                print "Created new playlist, id: " + str(playlist.getId())
-
             # add content if not already present
             current_pl_content = playlist.getPlaylistContent()
             if current_pl_content != "":
@@ -74,22 +71,28 @@ def main():
 
             if media_id not in current_pl_content:
                 playlist = update_playlist(client, content_to_add, playlist)
-                print "Done, added " + str(media_id) + " to " + str(playlist.getId())
+                print "Added " + str(media_id) + " to playlist " + str(playlist.getId())
 
+        # add to channel if not already present
         if media_id not in channel_content:
             add_to_channel(client, channel_id, media_id)
+            print "Added " + str(media_id) + " to channel " + str(channel_id)
 
+    # if licence has changed, remove from channel + playlist
     ids = [f.getId() for f in media_list]
     for media_ID in channel_content:
         if media_ID not in ids:
             client.categoryEntry.delete(media_ID, channel_id)
+            print "Deleted " + str(media_id) + " from channel " + str(channel_id)
+
             if playlist_creation:
                 playlist = get_existing_playlist(client, playlist_name, client.media.get(media_ID).getUserId())
                 delete_from_playlist(client, media_ID, playlist)
+                print "Deleted " + str(media_id) + " from playlist " + str(playlist.getId())
 
 
 def create_session(settings):
-    """ Connects to Kaltura Server and returns the authenticated client object"""
+    """ Connect to Kaltura Server and return the authenticated client object. """
     user_id = settings["session_settings"]["user_id"]
     ks_type = settings["session_settings"]["ks_type"]
     admin_secret = settings["session_settings"]["admin_secret"]
@@ -106,7 +109,7 @@ def create_session(settings):
 
 
 def filter_CC_content(client, page_index):
-    """ Returns a <KalturaMediaListResponse> containing all media which has a CC License of any kind """
+    """ Return a KalturaMediaListResponse containing all media which has any type of CC Licence. """
     filter = Plugins.Core.KalturaMediaEntryFilter()
     metadata_filter = Plugins.Metadata.KalturaMetadataSearchItem()
 
@@ -144,16 +147,14 @@ def filter_CC_content(client, page_index):
     metadata_filter.items = [condition_attribution, condition_att_no_deriv, condition_att_non_like,
                             condition_like, condition_non_com, condition_non_com_no_deriv]
     filter.advancedSearch = metadata_filter
-
     pager = Plugins.Core.KalturaFilterPager()
     pager.setPageSize(500)
     pager.setPageIndex(page_index)
-
     return client.media.list(filter, pager)
 
 
 def filter_free_text(client, free_text, page_index):
-    """ Returns <KalturaMediaListResponse> of the media which have the requested freeText in their metadata (tags/title) """
+    """ Return KalturaMediaListResponse containing the entries which have free_text in their metadata. """
     filter = Plugins.Core.KalturaMediaEntryFilter()
     filter.setFreeText(free_text)
     filter.orderBy = "-weight"
@@ -161,12 +162,11 @@ def filter_free_text(client, free_text, page_index):
     pager = Plugins.Core.KalturaFilterPager()
     pager.setPageSize(500)
     pager.setPageIndex(page_index)
-
     return client.media.list(filter, pager)
 
 
 def get_existing_channel(client, channel_name):
-    """ Returns requested channel, if it exists. Will throw an IndexError otherwise. """
+    """ Return requested channel if it exists. Otherwise throw an IndexError. """
     filter = Plugins.Core.KalturaCategoryFilter()
     filter.setFullNameEqual("MediaSpace>site>galleries>" + channel_name)
     results = client.category.list(filter)
@@ -174,7 +174,7 @@ def get_existing_channel(client, channel_name):
 
 
 def create_new_channel(client, channel_name, channel_description, channel_privacy):
-    """ Creates and returns a new channel with the specified parameters """
+    """ Create and return a new channel with the specified parameters. """
     category = Plugins.Core.KalturaCategory()
     category.setName(channel_name)
     category.setParentId(23880061)
@@ -184,16 +184,14 @@ def create_new_channel(client, channel_name, channel_description, channel_privac
 
 
 def get_channel_content(client, channel_id, page_index):
-    """ Returns a list of the ids of the media in the channel, ie. the contents of the channel """
+    """ Return a list of the ids of the entries in the channel, ie. the contents of the channel. """
     filter_category = Plugins.Core.KalturaCategoryEntryFilter()
     filter_category.setCategoryIdEqual(channel_id)
-
     pager = Plugins.Core.KalturaFilterPager()
     pager.setPageSize(500)
     pager.setPageIndex(page_index)
 
     cat_cont = client.categoryEntry.list(filter_category, pager)
-
     channel_contents = []
     for media in cat_cont.getObjects():
         channel_contents.append(media.getEntryId())
@@ -201,7 +199,7 @@ def get_channel_content(client, channel_id, page_index):
 
 
 def get_existing_playlist(client, playlist_name, user_id):
-    """ Returns requested playlist, if it exists. Will throw an IndexError otherwise. """
+    """ Return requested playlist if it exists. Otherwise throw an IndexError. """
     filter = Plugins.Core.KalturaPlaylistFilter()
     filter.setNameEqual(playlist_name)
     filter.setUserIdEqual(user_id)
@@ -210,7 +208,7 @@ def get_existing_playlist(client, playlist_name, user_id):
 
 
 def create_new_playlist(client, playlist_name, user_id, playlist_desc):
-    """ Creates and returns a new playlist with the specified parameters """
+    """ Create and return a new playlist with the specified parameters. """
     playlist = Plugins.Core.KalturaPlaylist()
     playlist.setName(playlist_name)
     playlist.setDescription(playlist_desc)
@@ -220,7 +218,7 @@ def create_new_playlist(client, playlist_name, user_id, playlist_desc):
 
 
 def update_playlist(client, content_to_add, original_playlist):
-    """ Updates playlist content and returns updated playlist """
+    """ Update playlist content and return updated playlist. """
     new_playlist = Plugins.Core.KalturaPlaylist()
     new_playlist.setPlaylistContent(content_to_add)
     client.playlist.update(original_playlist.getId(), new_playlist, "")
@@ -228,24 +226,16 @@ def update_playlist(client, content_to_add, original_playlist):
 
 
 def delete_from_playlist(client, content_to_remove, original_playlist):
-    """ Deletes contentToRemove from the playlist originalPlaylist and returns the updated playlist"""
+    """ Delete content_to_remove from the original_playlist and return the updated playlist. """
     elems = original_playlist.getPlaylistContent().split(", ")
-    print elems
-    print content_to_remove in elems
     if content_to_remove in elems:
         elems.remove(content_to_remove)
     new_content = (", ".join(elems))
-    print new_content
-    # update_playlist(client, new_content, original_playlist)
-
-    new_playlist = Plugins.Core.KalturaPlaylist()
-    new_playlist.setPlaylistContent(new_content)
-    client.playlist.update(original_playlist.getId(), new_playlist, "")
-    return get_existing_playlist(client, original_playlist.getName(), original_playlist.getUserId())
+    return update_playlist(client, new_content, original_playlist)
 
 
 def add_to_channel(client, channel_id, media_id):
-    """ Adds the media corresponding to mediaId to the channel """
+    """ Add the media corresponding to media_id to the channel. """
     category_entry = Plugins.Core.KalturaCategoryEntry()
     category_entry.setCategoryId(channel_id)
     category_entry.setEntryId(media_id)
