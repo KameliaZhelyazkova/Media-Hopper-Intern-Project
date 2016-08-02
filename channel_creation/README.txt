@@ -59,7 +59,7 @@ From the command line, you can then run:
 
 1. You can change the session, channel, playlist and filter settings by modifying "settings.json" file.
 To do so, enter the desired value for the field you wish to change next to the corresponding key in the sub-dictionary.
-For instance, "channel_name" can be modified to a new one by entering content (preferred naming) after the colons
+For instance, "channel_name" can be modified to a new one by entering your preferred naming after the colons
 within the quotation marks.
 
 Example code:
@@ -77,8 +77,3 @@ and "free_text" to filter by keywords. In the latter case, specify the keywords 
 
 4. For any other values of an attribute, you can check Kaltura's API documentation
 on: http://www.kaltura.com/api_v3/testmeDoc/.
-
-
-
-
-
