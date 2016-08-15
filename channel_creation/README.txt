@@ -75,5 +75,17 @@ or 3 (MEMBERS_ONLY).
 "filter_by" takes the value "CC" if you want to filter by Creative Commons licence type,
 and "free_text" to filter by keywords. In the latter case, specify the keywords in "free_text".
 
-4. For any other values of an attribute, you can check Kaltura's API documentation
+4. To create a new channel into a particular place into the structure make sure that you set the category.setParentId(...) to the place you would like your new channel to be created. 
+
+Example code:
+def create_new_channel(client, channel_name, channel_description, channel_privacy):
+    """ Create and return a new channel with the specified parameters. """
+    category = Plugins.Core.KalturaCategory()
+    category.setName(channel_name)
+    category.setParentId(35401612)
+    category.setDescription(channel_description)
+    category.setPrivacy(channel_privacy)
+    return client.category.add(category)
+
+5. For any other values of an attribute, you can check Kaltura's API documentation
 on: http://www.kaltura.com/api_v3/testmeDoc/.

@@ -177,7 +177,7 @@ def create_new_channel(client, channel_name, channel_description, channel_privac
     """ Create and return a new channel with the specified parameters. """
     category = Plugins.Core.KalturaCategory()
     category.setName(channel_name)
-    category.setParentId(23880061)
+    category.setParentId(35401612)
     category.setDescription(channel_description)
     category.setPrivacy(channel_privacy)
     return client.category.add(category)
