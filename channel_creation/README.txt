@@ -75,7 +75,7 @@ or 3 (MEMBERS_ONLY).
 "filter_by" takes the value "CC" if you want to filter by Creative Commons licence type,
 and "free_text" to filter by keywords. In the latter case, specify the keywords in "free_text".
 
-4. To create a new channel into a particular place into the structure make sure that you set the category.setParentId(...) to the place you would like your new channel to be created. 
+4. To create a new channel in a particular place into the structure make sure that you set the category.setParentId(...) to the place you would like your new channel to be created. 
 
 Example code:
 def create_new_channel(client, channel_name, channel_description, channel_privacy):
