@@ -3,6 +3,7 @@ import json
 
 
 def main():
+    # CHANGE PATH IF NECESSARY 
     file = open('/home/mediamigrator/django/channel_creation/settings.json')
     settings = json.load(file)
     file.close()
@@ -117,7 +118,7 @@ def filter_CC_content(client, page_index):
     metadata_filter.setType(2)
     # Profile Id of "UoE Default" custom metadata field which we want to search through
     
-    # DEV Environment
+    # DEV Environment - Metadata id of the UoE Default metadata entry
     #metadata_filter.setMetadataProfileId(7409571)
     # Production Environment
     metadata_filter.setMetadataProfileId(6417011)
@@ -158,7 +159,7 @@ def filter_CC_content(client, page_index):
 
 
 def filter_free_text(client, free_text, page_index):
-    """ Return KalturaMediaListResponse containing the entries which have free_text in their metadata. """
+    """ Return <KalturaMediaListResponse> containing the entries which have "free_text" in their metadata. """
     filter = Plugins.Core.KalturaMediaEntryFilter()
     filter.setFreeText(free_text)
     filter.orderBy = "-weight"
