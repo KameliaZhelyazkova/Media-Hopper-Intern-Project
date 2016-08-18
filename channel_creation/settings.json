@@ -2,13 +2,13 @@
 
   "session_settings": {"user_id": "admin",
                       "ks_type": 2,
-                      "admin_secret": "1a7227978d8228dde2a574fac2c9b371",
-                      "partner_id": 1817881,
+                      "admin_secret": "b8f75c8737827a1d52826d31bc4710a0",
+                      "partner_id": 2010292,
                       "service_url": "http://www.kaltura.com/"},
 
 
-  "channel_settings": {"channel_name": "Creative Commons Content",
-                      "channel_description": "This should hopefully have 70 entries by tomorrow.",
+  "channel_settings": {"channel_name": "Creative Commons",
+                      "channel_description": "",
                       "channel_privacy": 1},
 
 
@@ -16,8 +16,8 @@
                      "free_text":""},
 
 
-  "playlist_settings": {"playlist_creation": true,
-                       "playlist_name": "Connie's Cron Test",
+  "playlist_settings": {"playlist_creation": false,
+                       "playlist_name": "Playlists",
                        "playlist_desc": "Many playlists hopefully."}
 
 

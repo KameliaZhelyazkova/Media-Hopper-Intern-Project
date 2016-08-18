@@ -3,7 +3,7 @@ import json
 
 
 def main():
-    file = open('/home/mediamigrator/django/channel_creation/settings.json')
+    file = open('settings.json')#'/home/mediamigrator/django/channel_creation/settings.json')
     settings = json.load(file)
     file.close()
 
@@ -103,7 +103,7 @@ def create_session(settings):
     config.serviceUrl = service_url
     client = KalturaClient(config)
 
-    ks = client.generateSession(admin_secret, user_id, ks_type, partner_id)
+    ks = client.generateSession(admin_secret, user_id, ks_type, partner_id, privileges="disableentitlement")
     client.setKs(ks)
     return client
 
@@ -116,7 +116,11 @@ def filter_CC_content(client, page_index):
     # Type 2 = SEARCH_OR
     metadata_filter.setType(2)
     # Profile Id of "UoE Default" custom metadata field which we want to search through
-    metadata_filter.setMetadataProfileId(7409571)
+    
+    # DEV Environment
+    #metadata_filter.setMetadataProfileId(7409571)
+    # Production Environment
+    metadata_filter.setMetadataProfileId(6417011)
 
     # Setting all conditions, so all types of CC License are returned
     condition_attribution = Plugins.Core.KalturaSearchCondition()
@@ -177,6 +181,9 @@ def create_new_channel(client, channel_name, channel_description, channel_privac
     """ Create and return a new channel with the specified parameters. """
     category = Plugins.Core.KalturaCategory()
     category.setName(channel_name)
+    # DEV
+    #category.setParentId(23880061)
+    # PRODUCTION
     category.setParentId(35401612)
     category.setDescription(channel_description)
     category.setPrivacy(channel_privacy)
