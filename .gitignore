@@ -1,4 +1,6 @@
-settings.json
+channel_creation/settings.json
+
+
 # PYCHARM
 .idea/workspace.xml
 .idea/tasks.xml
